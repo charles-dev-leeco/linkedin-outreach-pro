@@ -13,7 +13,8 @@
     "clean": "turbo run clean",
     "web": "cd apps/web && npm run dev",
     "api": "cd apps/api && npm run dev",
-    "extension": "cd apps/extension && npm run build"
+    "extension": "cd apps/extension && npm run build",
+    "start": "node apps/api/dist/server.js"
   },
   "devDependencies": {
     "turbo": "^1.11.0",
