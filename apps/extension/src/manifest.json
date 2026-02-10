@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "LinkedIn Outreach Pro",
+  "version": "1.0.0",
+  "description": "Automate your LinkedIn connection requests with AI-powered personalization",
+  "permissions": [
+    "storage",
+    "alarms",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://www.linkedin.com/*",
+    "http://localhost:3001/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.linkedin.com/*",
+        "http://localhost:3000/*",
+        "http://127.0.0.1:3000/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}

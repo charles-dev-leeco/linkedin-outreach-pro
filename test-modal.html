@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LinkedIn Modal Test</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #1b1f23; padding: 40px; }
+    .artdeco-modal { background: white; border-radius: 8px; max-width: 500px; margin: 0 auto; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+    .artdeco-modal__header { padding: 16px 24px; border-bottom: 1px solid #e0e0e0; }
+    .artdeco-modal__header h2 { margin: 0; font-size: 20px; }
+    .artdeco-modal__content { padding: 16px 24px; }
+    .artdeco-modal__actionbar { padding: 16px 24px; border-top: 1px solid #e0e0e0; text-align: right; }
+    .artdeco-button { padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; margin-left: 8px; }
+    .artdeco-button--secondary { background: white; border: 1px solid #0a66c2; color: #0a66c2; }
+    .artdeco-button--primary { background: #0a66c2; color: white; }
+    .artdeco-button__text { }
+    #result { margin-top: 20px; padding: 20px; background: #0d1117; color: #58a6ff; border-radius: 8px; font-family: monospace; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+
+<div data-test-modal="" role="dialog" tabindex="-1" class="artdeco-modal artdeco-modal--layer-default send-invite" size="medium" aria-labelledby="send-invite-modal">
+  <div id="ember67" class="artdeco-modal__header ember-view">
+    <h2 id="send-invite-modal">Add a note to your invitation?</h2>
+  </div>
+  <div id="ember68" class="artdeco-modal__content ember-view">
+    <p class="display-flex">
+      <span class="flex-1">
+        Personalize your invitation to <strong>Sahil Maniar</strong> by adding a note. LinkedIn members are more likely to accept invitations that include a note.
+      </span>
+    </p>
+  </div>
+  <div id="ember69" class="artdeco-modal__actionbar ember-view text-align-right">
+    <button aria-label="Add a note" id="ember70" class="artdeco-button artdeco-button--2 artdeco-button--secondary ember-view mr1">
+      <span class="artdeco-button__text"> Add a note </span>
+    </button>
+    <button aria-label="Send without a note" id="ember71" class="artdeco-button artdeco-button--2 artdeco-button--primary ember-view ml1">
+      <span class="artdeco-button__text"> Send without a note </span>
+    </button>
+  </div>
+</div>
+
+<div id="result"></div>
+
+<script>
+// Test the button finding logic from content.ts
+const modal = document.querySelector('div.send-invite[role="dialog"]');
+const result = document.getElementById('result');
+let output = '';
+
+function log(msg) {
+  output += msg + '\n';
+  result.textContent = output;
+}
+
+log('Modal found: ' + !!modal);
+
+if (modal) {
+  const buttons = Array.from(modal.querySelectorAll('button'));
+  log('Buttons found: ' + buttons.length);
+  
+  buttons.forEach((b, i) => {
+    log(`  ${i}: text="${b.textContent?.trim()}" aria="${b.getAttribute('aria-label')}"`);
+  });
+  
+  log('\n--- Testing button detection strategies ---\n');
+  
+  // Strategy 1: By exact aria-label
+  let addNoteBtn = modal.querySelector('button[aria-label="Add a note"]');
+  log('Strategy 1 (exact aria-label): ' + (addNoteBtn ? '✅ FOUND' : '❌ not found'));
+  
+  // Strategy 2: case-insensitive aria-label
+  if (!addNoteBtn) {
+    addNoteBtn = buttons.find(b => b.getAttribute('aria-label')?.toLowerCase() === 'add a note') || null;
+    log('Strategy 2 (lowercase aria): ' + (addNoteBtn ? '✅ FOUND' : '❌ not found'));
+  }
+  
+  // Strategy 3: text content
+  if (!addNoteBtn) {
+    addNoteBtn = buttons.find(b => {
+      const txt = b.textContent?.replace(/\s+/g, ' ').trim().toLowerCase();
+      return txt === 'add a note';
+    }) || null;
+    log('Strategy 3 (text content): ' + (addNoteBtn ? '✅ FOUND' : '❌ not found'));
+  }
+  
+  // Strategy 4: secondary button in actionbar
+  if (!addNoteBtn) {
+    const actionbar = modal.querySelector('.artdeco-modal__actionbar');
+    if (actionbar) {
+      addNoteBtn = actionbar.querySelector('button.artdeco-button--secondary');
+      log('Strategy 4 (secondary button): ' + (addNoteBtn ? '✅ FOUND' : '❌ not found'));
+    }
+  }
+  
+  log('\n--- Final Result ---');
+  log('Add a note button: ' + (addNoteBtn ? '✅ FOUND - ' + addNoteBtn.getAttribute('aria-label') : '❌ NOT FOUND'));
+  
+  // Test click
+  if (addNoteBtn) {
+    addNoteBtn.addEventListener('click', () => {
+      log('\n🎉 Add a note button clicked!');
+    });
+    log('\nClick the "Add a note" button to test click detection.');
+  }
+}
+</script>
+
+</body>
+</html>
