@@ -26,14 +26,19 @@ let authClient: any;
 async function getAuthClient() {
   if (authClient) return authClient;
 
-  const credentialsPath = process.env.GOOGLE_SHEETS_CREDENTIALS_PATH || './credentials.json';
-  
-  if (!fs.existsSync(credentialsPath)) {
-    throw new Error('Google Sheets credentials file not found');
+  let credentials: any;
+
+  // Support credentials via env var (for cloud deployment) or file (for local dev)
+  if (process.env.GOOGLE_CREDENTIALS_JSON) {
+    credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
+  } else {
+    const credentialsPath = process.env.GOOGLE_SHEETS_CREDENTIALS_PATH || './credentials.json';
+    if (!fs.existsSync(credentialsPath)) {
+      throw new Error('Google Sheets credentials not found. Set GOOGLE_CREDENTIALS_JSON env var or provide credentials.json file.');
+    }
+    credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf-8'));
   }
 
-  const credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf-8'));
-  
   authClient = new google.auth.GoogleAuth({
     credentials,
     scopes: SCOPES,
